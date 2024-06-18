@@ -55,6 +55,12 @@ public class UserService extends BaseService<User>{
 		return new User();
 	}
 	
+	public UserModel getModelLogined() {
+		User entity = getUserByUsername(getUserLogined().getUsername());
+		UserModel model = userToModel(entity);
+		return model;
+	}
+	
 	public UserModel getModelById(int id) {
 		UserModel model = userToModel(super.getById(id));
 		return model;
@@ -74,6 +80,7 @@ public class UserService extends BaseService<User>{
 	
 	@Transactional
 	public void saveAddCustomer(UserModel model) {
+		
 		List<User> users = findAll();
 		for(User user : users) {
 			if(user.getUsername().equals(model.getUsername())) {
@@ -83,8 +90,8 @@ public class UserService extends BaseService<User>{
 		if(model.getRole() != "CUSTOMER") {
 			model.setRole("CUSTOMER");
 		}
-		if(model.getPasswrod() != null && model.getPasswrod().trim() != "") {
-			model.setPasswrod(new BCryptPasswordEncoder(4).encode(model.getPasswrod()));
+		if(model.getPassword() != null && model.getPassword().trim() != "") {
+			model.setPassword(new BCryptPasswordEncoder(4).encode(model.getPassword()));
 		}else {
 			throw new NullPointerException("Mật khẩu không để trống");
 		}
@@ -97,6 +104,7 @@ public class UserService extends BaseService<User>{
 	
 	@Transactional
 	public void saveAddStaff(UserModel model) {
+
 		List<User> users = findAll();
 		for(User user : users) {
 			if(user.getUsername().equals(model.getUsername())) {
@@ -106,8 +114,8 @@ public class UserService extends BaseService<User>{
 		if(model.getRole() != "STAFF") {
 			model.setRole("STAFF");
 		}
-		if(model.getPasswrod() != null && model.getPasswrod().trim() != "") {
-			model.setPasswrod(new BCryptPasswordEncoder(4).encode(model.getPasswrod()));
+		if(model.getPassword() != null && model.getPassword().trim() != "") {
+			model.setPassword(new BCryptPasswordEncoder(4).encode(model.getPassword()));
 		}else {
 			throw new NullPointerException("Mật khẩu không để trống");
 		}
@@ -115,14 +123,14 @@ public class UserService extends BaseService<User>{
 		User entity = userToEntity(model);
 		entity.setCreateDate(new Date());
 		entity.addRole(roleService.getRoleByName("STAFF"));
-		super.saveOrUpdate(entity);;
+		super.saveOrUpdate(entity);
 	}
 	
 	@Transactional
 	public void updateUser(UserModel model, Integer id) {
 		User entity = super.getById(id);
-		if(model.getPasswrod() != null && model.getPasswrod().trim() != "") {
-			model.setPasswrod(new BCryptPasswordEncoder(4).encode(model.getPasswrod()));
+		if(model.getPassword() != null && model.getPassword().trim() != "") {
+			model.setPassword(new BCryptPasswordEncoder(4).encode(model.getPassword()));
 		}else {
 			throw new NullPointerException("Mật khẩu không để trống");
 		}
@@ -171,7 +179,7 @@ public class UserService extends BaseService<User>{
 				model.setCreateDate(entity.getCreateDate());
 				model.setUpdateDate(entity.getUpdateDate());
 				model.setUsername(entity.getUsername());
-				model.setPasswrod(entity.getPassword());
+				model.setPassword(entity.getPassword());
 				model.setName(entity.getName());
 				model.setAvatar(entity.getAvatar());
 				model.setDateOfBirth(entity.getDateOfBirth());
@@ -188,7 +196,7 @@ public class UserService extends BaseService<User>{
 		entity.setCreateDate(model.getCreateDate());
 		entity.setUpdateDate(model.getUpdateDate());
 		entity.setUsername(model.getUsername());
-		entity.setPassword(model.getPasswrod());
+		entity.setPassword(model.getPassword());
 		entity.setName(model.getName());
 		entity.setAvatar(model.getAvatar());
 		entity.setDateOfBirth(model.getDateOfBirth());

@@ -11,6 +11,7 @@ import vn.dev.cinema.entity.Cinema;
 import vn.dev.cinema.entity.Message;
 import vn.dev.cinema.entity.TicketType;
 import vn.dev.cinema.model.SticketTypeModel;
+import vn.dev.cinema.model.CategoryModel;
 import vn.dev.cinema.model.CinemaModel;
 import vn.dev.cinema.model.MessageModel;
 import vn.dev.cinema.model.TicketTypeModel;
@@ -98,9 +99,9 @@ public class TransmitService {
 	}
 	
 	
-	List<SticketTypeModel> categoryEntitiesToModels(List<Category> entities){
-		List<SticketTypeModel> categories = entities.stream()
-				.map(entity -> new SticketTypeModel(
+	List<CategoryModel> categoryEntitiesToModels(List<Category> entities){
+		List<CategoryModel> categories = entities.stream()
+				.map(entity -> new CategoryModel(
 						entity.getId(),
 						entity.getCreateDate(),
 						entity.getUpdateDate(),						
@@ -110,8 +111,8 @@ public class TransmitService {
 		return categories;
 	}
 	
-	SticketTypeModel categoryToModel(Category entity) {
-		SticketTypeModel model = new SticketTypeModel();
+	CategoryModel categoryToModel(Category entity) {
+		CategoryModel model = new CategoryModel();
 		model.setId(entity.getId());
 		model.setCreateDate(entity.getCreateDate());
 		model.setUpdateDate(entity.getUpdateDate());
@@ -120,7 +121,7 @@ public class TransmitService {
 		return model;
 	}
 	
-	Category categoryToEntity(SticketTypeModel model) {
+	Category categoryToEntity(CategoryModel model) {
 		Category entity = new Category();
 		entity.setId(model.getId());
 		entity.setCreateDate(model.getCreateDate());

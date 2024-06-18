@@ -40,7 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, 
 				FilterChain filterChain) throws ServletException, IOException {
 		String authorizationHeader = request.getHeader(AUTHORIZATION);
-		if (authorizationHeader != null && authorizationHeader.startsWith("NoAuth")) {//"Bear"
+		if (authorizationHeader != null && authorizationHeader.startsWith("Bearer")) {
 			try {
 				String token = authorizationHeader.substring("Bearer ".length());
 				Algorithm algorthm = Algorithm.HMAC256(Secret_key.getBytes());

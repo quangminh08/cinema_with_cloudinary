@@ -5,7 +5,7 @@ import java.util.Date;
 public class UserModel extends BaseModel {
 
 	private String username;
-	private String passwrod;
+	private String password;
 	private String name;
 	private String avatar;
 	private Date dateOfBirth;
@@ -30,15 +30,15 @@ public class UserModel extends BaseModel {
 		this.username = username;
 	}
 
-	public String getPasswrod() {
-		if (this.passwrod == null) {
+	public String getPassword() {
+		if (this.password == null) {
 			return "";
 		}
-		return passwrod;
+		return password;
 	}
 
-	public void setPasswrod(String passwrod) {
-		this.passwrod = passwrod;
+	public void setPassword(String passwrod) {
+		this.password = passwrod;
 	}
 
 	public Boolean getStatus() {
@@ -96,7 +96,7 @@ public class UserModel extends BaseModel {
 			String role, Boolean status) {
 		super(id, createDate, updateDate);
 		this.username = username;
-		this.passwrod = passwrod;
+		this.password = passwrod;
 		this.name = name;
 		this.avatar = avatar;
 		this.dateOfBirth = dateOfBirth;

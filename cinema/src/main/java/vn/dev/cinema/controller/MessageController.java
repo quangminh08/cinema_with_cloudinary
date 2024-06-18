@@ -26,6 +26,11 @@ public class MessageController {
 	private MessageService messageService;
 	
 	
+	@GetMapping()
+	public List<MessageModel> messages() {
+		return messageService.findAllModel();
+	}
+	
 	@GetMapping("/{id}")
 	public MessageModel message(@PathVariable("id") Integer id) {
 		return messageService.getModelById(id);

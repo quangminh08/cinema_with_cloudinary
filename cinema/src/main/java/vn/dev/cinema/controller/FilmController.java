@@ -7,6 +7,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,14 +36,32 @@ public class FilmController {
 	private CloudinaryService cloudinaryService;
 	
 	@GetMapping()
-	public List<FilmModel> getCinemas(){
-		return filmService.findAllModel();
+	public ResponseEntity<Map<String, List<FilmModel>>> getCinemas(){
+		List<FilmModel> models = filmService.findAllModel();
+		
+		if(models.size() == 0) {
+			Map<String, List<FilmModel>> jsonResult = new HashMap<String, List<FilmModel>>();
+			jsonResult.put("not found! ", models);
+			return ResponseEntity.ok(jsonResult);
+		}
+		Map<String, List<FilmModel>> jsonResult = new HashMap<String, List<FilmModel>>();
+		jsonResult.put("successfully", models);
+		return ResponseEntity.ok(jsonResult);
 	}
 	
 	@GetMapping("/search")
-	public List<FilmModel> searchCiname(@RequestParam(value="title", required = false) String title, 
+	public ResponseEntity<Map<String, List<FilmModel>>> searchCiname(@RequestParam(value="title", required = false) String title, 
 			@RequestParam(value="performer", required = false) String performer){
-		return filmService.getModelByModelSearch(title,performer);
+		List<FilmModel> models = filmService.getModelByModelSearch(title,performer);
+		if(models.size() == 0) {
+			Map<String, List<FilmModel>> jsonResult = new HashMap<String, List<FilmModel>>();
+			jsonResult.put("not found! ", models);
+			return ResponseEntity.ok(jsonResult);
+		}
+		Map<String, List<FilmModel>> jsonResult = new HashMap<String, List<FilmModel>>();
+		jsonResult.put("successfully", models);
+		return ResponseEntity.ok(jsonResult);
+		
 	}
 	
 	@GetMapping("/{id}")
@@ -51,12 +70,17 @@ public class FilmController {
 		return new ResponseEntity<>(model, HttpStatus.OK);
 	}
 	
+	@PreAuthorize("hasAnyAuthority('STAFF', 'ADMIN')")
 	@PostMapping()
-	public ResponseEntity<FilmModel> addFilm(@RequestBody FilmModel model){
-		filmService.saveFilm(model);
-		return new ResponseEntity<>(model, HttpStatus.OK);
+	public ResponseEntity<Object> addFilm(@RequestBody FilmModel model){
+		if (model.getId() == null || model.getId() <=0 ) {
+			filmService.saveFilm(model);
+			return new ResponseEntity<>(model, HttpStatus.OK);
+		}
+		return new ResponseEntity<>("Fault: The id field is not necessary.", HttpStatus.EXPECTATION_FAILED);
 	}
 	
+	@PreAuthorize("hasAnyAuthority('STAFF', 'ADMIN')")
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Map<String, Boolean>> deleteFilm(@PathVariable("id") Integer id){
 		boolean status = false;
@@ -66,13 +90,17 @@ public class FilmController {
 		return ResponseEntity.ok(response);
 	}
 	
+	@PreAuthorize("hasAnyAuthority('STAFF', 'ADMIN')")
 	@PutMapping("/{id}")
-	public ResponseEntity<FilmModel> updateFilm(@RequestBody FilmModel model,
+	public ResponseEntity<Map<String, Object>> updateFilm(@RequestBody FilmModel model,
 			@PathVariable("id") Integer id){
 		filmService.updateFilm(model, id);
-		return new ResponseEntity<>(model, HttpStatus.OK);
+		Map<String, Object> jsonResult = new HashMap<String, Object>();
+		jsonResult.put("Update completely ", model);
+		return ResponseEntity.ok(jsonResult);
 	}
 	
+	@PreAuthorize("hasAnyAuthority('STAFF', 'ADMIN')")
 	@PostMapping("/upload-avatar/{filmId}")
     public FilmModel uploadImage(@RequestParam("file")MultipartFile file, @PathVariable("filmId") Integer filmId){
         Map data = this.cloudinaryService.upload(file);

@@ -7,6 +7,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,10 +40,13 @@ public class TicketController {
 		return new ResponseEntity<>(model, HttpStatus.OK);
 	}
 	
+	
 	@PostMapping()
-	public ResponseEntity<TicketModel> addTicket(@RequestBody TicketModel model){
-		ticketService.saveTicket(model);
-		return new ResponseEntity<>(model, HttpStatus.OK);
+	public ResponseEntity<Map<String, Object>> addTicket(@RequestBody TicketModel model){
+		String message = ticketService.saveTicket(model);
+		Map<String, Object> jsonResult = new HashMap<String, Object>();
+		jsonResult.put(message, model);
+		return ResponseEntity.ok(jsonResult);
 	}
 	
 	@DeleteMapping("/{id}")
@@ -50,25 +54,27 @@ public class TicketController {
 		boolean status = false;
 		status = ticketService.delById(id);
 		Map<String, Boolean> response = new HashMap<String, Boolean>();
-		response.put("delete ticket ", status);
+		response.put("delete ticket is ", status);
 		return ResponseEntity.ok(response);
 	}
 	
 	@PutMapping("/{id}")
-	public ResponseEntity<TicketModel> updateTicket(@RequestBody TicketModel model,
+	public ResponseEntity<Map<String, Object>> updateTicket(@RequestBody TicketModel model,
 			@PathVariable("id") Integer id){
-		ticketService.updateTicket(model, id);
-		return new ResponseEntity<>(model, HttpStatus.OK);
+		String message = ticketService.updateTicket(model, id);
+		Map<String, Object> jsonResult = new HashMap<String, Object>();
+		jsonResult.put(message, model);
+		return ResponseEntity.ok(jsonResult);
 	}
 	
-	
+	@PreAuthorize("hasAnyAuthority('STAFF', 'ADMIN')")
 	// Xác nhận và gửi vé
 	@PostMapping("/status/{id}")
 	public ResponseEntity<Map<String, Boolean>> confirmTicket(@PathVariable("id") Integer id){
 		boolean status = false;
 		status = ticketService.changeStatus(id);
 		Map<String, Boolean> response = new HashMap<String, Boolean>();
-		response.put("set status ticket ", status);
+		response.put("Set the ticket status is success?", status);
 		return ResponseEntity.ok(response);
 	}
 }

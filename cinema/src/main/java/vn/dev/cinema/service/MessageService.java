@@ -42,17 +42,17 @@ public class MessageService extends BaseService<Message>{
 		model.setCreateDate(new Date());
 		
 		User sendUser = userService.getById(senderId);
-		if(sendUser.getId() != null ) {
+		try{
 			model.setSenderId(sendUser.getId());
-		}else {
-			return null;
+		}catch(Exception e) {
+			throw new NullPointerException("sender id not found, sender is null");
 		}
 		
 		User receiveUser = userService.getById(receiverId);
-		if(receiveUser.getId() != null ) {
+		try{
 			model.setReceiverId(receiveUser.getId());
-		}else {
-			return null;
+		}catch(Exception e) {
+			throw new NullPointerException("receiver id not found, receiver is null");
 		}
 		Message entity = transmitService.messsageToEntity(model);
 		super.saveOrUpdate(entity);

@@ -33,9 +33,21 @@ public class TicketService extends BaseService<Ticket>{
 	public List<TicketModel> findAllModel() {
 		return ticketEntitiesToModels(super.findAll());
 	}
+	
+	public List<Ticket> getTicketByScheduleId(Integer scheduleId){
+		String sql = "SELECT * FROM cinimakhoa.tbl_ticket where schedule_id=" + scheduleId + " ;";
+		return super.executeNativeSql(sql);
+	}
 
 	@Transactional
-	public void saveTicket(TicketModel model) {
+	public String saveTicket(TicketModel model) {
+		List<Ticket> soldCheck = getTicketByScheduleId(model.getScheduleId());
+		for (Ticket t : soldCheck) {
+			if(t.getPossition().equalsIgnoreCase(model.getPossition().trim())) {
+				return "Vị trí này đã được đặt trước, vui lòng chọn vị trí khác";
+			}
+		}
+		
 		Double priceCeofficient = ticketTypeService.getById(model.getTicketTypeId()).getPriceCoefficient();
 		Double filmPrice = scheduleService.getById(model.getScheduleId()).getFilm().getPrice();
 		model.setPrice(filmPrice * priceCeofficient);
@@ -43,6 +55,7 @@ public class TicketService extends BaseService<Ticket>{
 		Ticket entity = ticketToEntity(model);
 		entity.setCreateDate(new Date());
 		super.saveOrUpdate(entity);
+		return "Đặt vé thành công";
 	}
 	
 	@Transactional
@@ -52,11 +65,19 @@ public class TicketService extends BaseService<Ticket>{
 	}
 
 	@Transactional
-	public void updateTicket(TicketModel model, Integer id) {
+	public String updateTicket(TicketModel model, Integer id) {
+		List<Ticket> soldCheck = getTicketByScheduleId(model.getScheduleId());
+		for (Ticket t : soldCheck) {
+			if(t.getPossition().equalsIgnoreCase(model.getPossition().trim())) {
+				return "Vị trí này đã được đặt trước, vui lòng chọn vị trí khác";
+			}
+		}
+		
 		Ticket entity = ticketToEntity(model);
 		entity.setId(id);
 		entity.setUpdateDate(new Date());
 		super.saveOrUpdate(entity);
+		return "Cập nhật đặt vé thành công";
 	}
 	
 	@Transactional
